@@ -1,4 +1,6 @@
-echo/echo
+support/echo
+support/hello
+support/chat-simple
 http/http
 markov/markov
 tcp/tcp

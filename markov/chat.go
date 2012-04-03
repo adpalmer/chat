@@ -38,7 +38,7 @@ func socketHandler(ws *websocket.Conn) {
 		w.CloseWithError(err)
 	}()
 	s := Socket{r, ws, make(chan bool)}
-	go serve(s)
+	go mux(s)
 	<-s.done
 }
 
@@ -52,7 +52,7 @@ const (
 	markovWords = 10
 )
 
-func serve(c Socket) {
+func mux(c Socket) {
 	fmt.Fprint(c, "Waiting for a partner...")
 	select {
 	case partner <- c:
@@ -64,17 +64,17 @@ func serve(c Socket) {
 	}
 }
 
-func chat(p, c Socket) {
-	fmt.Fprintln(p, "Found one! Say hi.")
-	fmt.Fprintln(c, "Found one! Say hi.")
+func chat(a, b Socket) {
+	fmt.Fprintln(a, "Found one! Say hi.")
+	fmt.Fprintln(b, "Found one! Say hi.")
 	errc := make(chan error, 1)
-	go cp(p, c, errc)
-	go cp(c, p, errc)
+	go cp(a, b, errc)
+	go cp(b, a, errc)
 	if err := <-errc; err != nil {
 		log.Println(err)
 	}
-	p.done <- true
-	c.done <- true
+	a.done <- true
+	b.done <- true
 }
 
 func cp(w io.Writer, r io.Reader, errc chan<- error) {

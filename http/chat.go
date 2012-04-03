@@ -31,29 +31,33 @@ type Socket struct {
 
 func socketHandler(ws *websocket.Conn) {
 	s := Socket{ws, make(chan bool)}
-	go serve(s)
+	go mux(s)
 	<-s.done
 }
 
 var partner = make(chan Socket)
 
-func serve(c Socket) {
+func mux(c Socket) {
 	fmt.Fprint(c, "Waiting for a partner...")
 	select {
 	case partner <- c:
 		// now handled by the other goroutine
 	case p := <-partner:
-		fmt.Fprintln(p, "Found one! Say hi.")
-		fmt.Fprintln(c, "Found one! Say hi.")
-		errc := make(chan error, 1)
-		go cp(p, c, errc)
-		go cp(c, p, errc)
-		if err := <-errc; err != nil {
-			log.Println(err)
-		}
-		p.done <- true
-		c.done <- true
+		chat(p, c)
 	}
+}
+
+func chat(a, b Socket) {
+	fmt.Fprintln(a, "Found one! Say hi.")
+	fmt.Fprintln(b, "Found one! Say hi.")
+	errc := make(chan error, 1)
+	go cp(a, b, errc)
+	go cp(b, a, errc)
+	if err := <-errc; err != nil {
+		log.Println(err)
+	}
+	a.done <- true
+	b.done <- true
 }
 
 func cp(w io.Writer, r io.Reader, errc chan<- error) {
