@@ -7,8 +7,10 @@ import (
 	"net"
 )
 
+const listenAddr = "localhost:4000"
+
 func main() {
-	l, err := net.Listen("tcp", ":4000")
+	l, err := net.Listen("tcp", listenAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,11 +31,11 @@ func serve(c io.ReadWriteCloser) {
 	case partner <- c:
 		// now handled by the other goroutine
 	case p := <-partner:
-		fmt.Fprint(p, "found one! Say hi.\n")
-		fmt.Fprint(c, "found one! Say hi.\n")
+		fmt.Fprintln(p, "Found one! Say hi.")
+		fmt.Fprintln(c, "Found one! Say hi.")
 		errc := make(chan error, 1)
-		go copy(p, c, errc)
-		go copy(c, p, errc)
+		go cp(p, c, errc)
+		go cp(c, p, errc)
 		if err := <-errc; err != nil {
 			log.Println(err)
 		}
@@ -42,7 +44,7 @@ func serve(c io.ReadWriteCloser) {
 	}
 }
 
-func copy(w io.Writer, r io.Reader, errc chan<- error) {
+func cp(w io.Writer, r io.Reader, errc chan<- error) {
 	_, err := io.Copy(w, r)
 	errc <- err
 }

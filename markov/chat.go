@@ -65,8 +65,8 @@ func serve(c Socket) {
 }
 
 func chat(p, c Socket) {
-	fmt.Fprint(p, "Found one! Say hi.")
-	fmt.Fprint(c, "Found one! Say hi.")
+	fmt.Fprintln(p, "Found one! Say hi.")
+	fmt.Fprintln(c, "Found one! Say hi.")
 	errc := make(chan error, 1)
 	go cp(p, c, errc)
 	go cp(c, p, errc)
