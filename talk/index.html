@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html manifest="cache.appcache">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" />
+    <title>[Go: Code that grows with grace]</title>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans|Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+    <link id="prettify-link" href="src/prettify/prettify.css" rel="stylesheet" disabled />
+    <link href="css/default.css" class="theme" rel="stylesheet" media="screen"  />
+    <link href="css/common.css" rel="stylesheet" media="screen" />
+  </head>
+  <body>
+    <nav id="helpers">
+      <button title="Previous slide" id="nav-prev" class="nav-prev">⇽</button> 
+      <button title="Jump to a random slide" id="slide-no">5</button> 
+      <button title="Next slide" id="nav-next" class="nav-next">⇾</button>
+      <menu>
+        <button type="checkbox" data-command="toc" title="Table of Contents" class="toc">TOC</button>
+        <button type="checkbox" data-command="notes" title="View Slide Notes">✏</button>
+        <button type="checkbox" data-command="source" title="View slide source">↻</button>
+        <button type="checkbox" data-command="help" title="View Help">?</button>
+      </menu>
+    </nav>
+    <div class="presentation">
+      <div id="presentation-counter">Loading...</div>
+      <div class="slides">
+        <div class="slide" id="landing-slide">
+          <style>
+            #landing-slide p {
+              font-size: 35px;
+            }
+          </style>
+          <section class="middle">
+            <p>This presentation is an HTML5 web site</p>
+            <p>Press <span id="left-init-key" class="key">&rarr;</span> key to advance.</p>
+          </section>
+
+          <aside class="note">
+            <section>
+              Welcome! (This field is for presenter notes and commentary.)
+            </section>
+          </aside> 
+        </div>
+
+        <div class="slide" id="controls-slide">
+          <header>Controls</header>
+          <style>
+            #controls-slide li, #controls-slide p {
+              font-size: 32px;
+            }
+            #controls-slide .key {
+              bottom: 2px;
+            }
+          </style>
+          <section>
+            <ul>
+              <li><span class="key">&larr;</span> and <span class="key">&rarr;</span> to move around.</li>
+              <li><span class="key">Ctrl/Command</span> and <span class="key">+</span> or <span class="key">-</span> to zoom.</li>
+              <li><span class="key">S</span> to view page source.</li>
+              <li><span class="key">N</span> to toggle speaker notes.</li>
+              <li><span class="key">3</span> to toggle 3D effect.</li>
+              <li><span class="key">0</span> to toggle help.</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="slide" id="hello">
+          <section class="middle">
+            <hgroup><img src="http://golang.org/doc/gopher/bumper640x360.png"></hgroup>
+          </section>
+        </div>
+
+        <div class="slide" id="title-slide">
+          <style>
+            #title-slide h1, #title-slide h2 {
+              color: black;
+            }
+            #title-slide h1 {
+              font-size: 80px;
+            }
+            #title-slide h2 {
+              font-size: 36px;
+            }
+          </style>
+          <section class="middle">
+            <hgroup>
+              <h1>
+                
+                  Go:<br>
+                
+                  Code that grows<br>
+                
+                  with grace<br>
+                
+              </h1>
+              <h2>
+                Andrew Gerrand<br>adg@golang.org<br>Tumblr<br>Apr 20, 2012<br>
+              </h2>
+            </hgroup>
+          </section>
+        </div>
+
+	<!-- start of slide 0 -->
+        <div class="slide" id="slide-0">
+          <header>Hello, go</header>
+
+          <section>
+            <p>
+            You may have heard of Go. It&#39;s my favorite language.<br>
+            </p>
+            
+            <ul>
+            
+            <li>compiled, compiles fast,</li>
+            
+            <li>statically typed, with &#39;duck typing&#39; via interfaces,</li>
+            
+            <li>small, with a &#39;batteries included&#39; standard library,</li>
+            
+            <li>great concurrency support,</li>
+            
+            <li>recently release version 1.</li>
+            
+            </ul>
+            
+
+
+<pre>
+<!--{{code "../support/hello.go"}}
+-->package main
+
+import &#34;fmt&#34;
+
+func main() {
+    fmt.Println(&#34;Hello, go&#34;)
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 0 --><!-- start of slide 1 -->
+        <div class="slide" id="slide-1">
+          <header>Hello, net</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../support/hello-net.go"}}
+-->package main
+
+import (
+    &#34;fmt&#34;
+    &#34;log&#34;
+    &#34;net&#34;
+)
+
+const listenAddr = &#34;localhost:4000&#34;
+
+func main() {
+    l, err := net.Listen(&#34;tcp&#34;, listenAddr)
+    if err != nil {
+        log.Fatal(err)
+    }
+    for {
+        c, err := l.Accept()
+        if err != nil {
+            log.Fatal(err)
+        }
+        fmt.Fprintln(c, &#34;Hello!&#34;)
+        c.Close()
+    }
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 1 --><!-- start of slide 2 -->
+        <div class="slide" id="slide-2">
+          <header>Interfaces</header>
+
+          <section>
+            <p>
+            Hey neato! We can use Fprint to write to a net connection.<br>
+            
+            That&#39;s because a net.Conn is an io.Writer.<br>
+            
+            Put another way: net.Conn is a subset of io.Writer.<br>
+            </p>
+            
+
+
+<pre>
+<!--{{code "../support/hello-net.go" `/Fprint/`}}
+-->        fmt.Fprintln(c, &#34;Hello!&#34;)
+</pre>
+
+<pre>
+<!--{{code "../support/defs.go" `/Fprint/`}}
+-->func Fprint(w io.Writer, a ...interface{}) (n int, err error)
+</pre>
+
+<pre>
+<!--{{code "../support/defs.go" `/type.Writer/` `/^}/`}}
+-->type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+</pre>
+
+<pre>
+<!--{{code "../support/defs.go" `/type.Conn/` `/^}/`}}
+-->type Conn interface {
+    Read(b []byte) (n int, err error)
+    Write(b []byte) (n int, err error)
+    Close() error
+    // ... some additional methods omitted ...
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 2 --><!-- start of slide 3 -->
+        <div class="slide" id="slide-3">
+          <header>An echo server</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../support/echo-no-concurrency.go"}}
+-->package main
+
+import (
+    &#34;io&#34;
+    &#34;log&#34;
+    &#34;net&#34;
+)
+
+const listenAddr = &#34;localhost:4000&#34;
+
+func main() {
+    l, err := net.Listen(&#34;tcp&#34;, listenAddr)
+    if err != nil {
+        log.Fatal(err)
+    }
+    for {
+        c, err := l.Accept()
+        if err != nil {
+            log.Fatal(err)
+        }
+        io.Copy(c, c)
+    }
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 3 --><!-- start of slide 4 -->
+        <div class="slide" id="slide-4">
+          <header>A concurrent echo server</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../support/echo.go"}}
+-->package main
+
+import (
+    &#34;io&#34;
+    &#34;log&#34;
+    &#34;net&#34;
+)
+
+const listenAddr = &#34;localhost:4000&#34;
+
+func main() {
+    l, err := net.Listen(&#34;tcp&#34;, listenAddr)
+    if err != nil {
+        log.Fatal(err)
+    }
+    for {
+        c, err := l.Accept()
+        if err != nil {
+            log.Fatal(err)
+        }
+        go io.Copy(c, c)
+    }
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 4 --><!-- start of slide 5 -->
+        <div class="slide" id="slide-5">
+          <header>Goroutines</header>
+
+          <section>
+            <p>
+            TODO: describe goroutines<br>
+            
+            <br>
+            </p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 5 --><!-- start of slide 6 -->
+        <div class="slide" id="slide-6">
+          <header>&#34;Chat roulette&#34;</header>
+
+          <section>
+            <p>
+            In this talk we&#39;ll look at a simple program, based on the popular &#34;chat roulette&#34; site.<br>
+            
+            <br>
+            
+            In short:<br>
+            </p>
+            
+            <ul>
+            
+            <li>a user connects,</li>
+            
+            <li>another user connects,</li>
+            
+            <li>what each user types is sent to the other.</li>
+            
+            </ul>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 6 --><!-- start of slide 7 -->
+        <div class="slide" id="slide-7">
+          <header>Design</header>
+
+          <section>
+            <p>
+            The chat program is similar to the echo program. With echo, we copy a connection&#39;s incoming data back to the connection.<br>
+            
+            <br>
+            
+            For chat, we must copy the incoming data from one user to another.  <br>
+            
+            <br>
+            
+            Copying the data is easy. As in real life, the hard part is matching one conversation partner with another.<br>
+            
+            <br>
+            
+            TOOD: diagram<br>
+            
+            <br>
+            </p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 7 --><!-- start of slide 8 -->
+        <div class="slide" id="slide-8">
+          <header>Channels</header>
+
+          <section>
+            <p>
+            TODO: describe channels<br>
+            
+            <br>
+            </p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 8 --><!-- start of slide 9 -->
+        <div class="slide" id="slide-9">
+          <header>Select</header>
+
+          <section>
+            <p>
+            TODO: describe select<br>
+            
+            <br>
+            </p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 9 --><!-- start of slide 10 -->
+        <div class="slide" id="slide-10">
+          <header>Modifying echo to create chat</header>
+
+          <section>
+            <p>
+            In the accept loop, we replace the call to io.Copy with a call to a new function: mux.<br>
+            
+            <br>
+            </p>
+            
+
+
+<pre>
+<!--{{code "../support/echo.go" `/Accept/` `/go/`}}
+-->        c, err := l.Accept()
+        if err != nil {
+            log.Fatal(err)
+        }
+        go io.Copy(c, c)
+</pre>
+
+<pre>
+<!--{{code "../support/chat-simple.go" `/Accept/` `/go/`}}
+-->        c, err := l.Accept()
+        if err != nil {
+            log.Fatal(err)
+        }
+        go mux(c)
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 10 --><!-- start of slide 11 -->
+        <div class="slide" id="slide-11">
+          <header>The matcher</header>
+
+          <section>
+            <p>
+            The mux function simultaneously tries to send *and* receive a connection on the partner channel.<br>
+            </p>
+            
+            <ul>
+            
+            <li>If the send succeeds, the connection has been handed off to another goroutine, so the function exits and the goroutine shuts down.</li>
+            
+            <li>If the receive succeeds, a connection has been received from another goroutine. The current goroutine then has two connections, so it starts a chat session between them.</li>
+            
+            </ul>
+            
+
+
+<pre>
+<!--{{code "../support/chat-simple.go" `/var.partner/` `/^}/`}}
+-->var partner = make(chan io.ReadWriter)
+
+func mux(c io.ReadWriter) {
+    fmt.Fprint(c, &#34;Waiting for a partner...&#34;)
+    select {
+    case partner &lt;- c:
+        // now handled by the other goroutine
+    case p := &lt;-partner:
+        chat(p, c)
+    }
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 11 --><!-- start of slide 12 -->
+        <div class="slide" id="slide-12">
+          <header>The conversation</header>
+
+          <section>
+            <p>
+            The chat function sends a greeting to each connection and then copies data from one to the other, and vice versa.<br>
+            
+            <br>
+            
+            Notice that it launches another goroutine so that the copy operations may happen concurrently.<br>
+            
+            <br>
+            </p>
+            
+
+
+<pre>
+<!--{{code "../support/chat-simple.go" `/func.chat/` `/^}/`}}
+-->func chat(a, b io.ReadWriter) {
+    fmt.Fprintln(a, &#34;Found one! Say hi.&#34;)
+    fmt.Fprintln(b, &#34;Found one! Say hi.&#34;)
+    go io.Copy(a, b)
+    io.Copy(b, a)
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 12 --><!-- start of slide 13 -->
+        <div class="slide" id="slide-13">
+          <header>Error handling</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../tcp/chat.go" `/func.chat/` `/^}/`}}
+-->func chat(a, b io.ReadWriteCloser) {
+    fmt.Fprintln(a, &#34;Found one! Say hi.&#34;)
+    fmt.Fprintln(b, &#34;Found one! Say hi.&#34;)
+    errc := make(chan error, 1)
+    go cp(a, b, errc)
+    go cp(b, a, errc)
+    if err := &lt;-errc; err != nil {
+        log.Println(err)
+    }
+    a.Close()
+    b.Close()
+}
+</pre>
+
+<pre>
+<!--{{code "../tcp/chat.go" `/func.cp/` `/^}/`}}
+-->func cp(w io.Writer, r io.Reader, errc chan&lt;- error) {
+    _, err := io.Copy(w, r)
+    errc &lt;- err
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 13 --><!-- start of slide 14 -->
+        <div class="slide" id="slide-14">
+          <header>Taking it to the web </header>
+
+          <section>
+            <p>
+            TODO: describe web version<br>
+            
+            <br>
+            </p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 14 --><!-- start of slide 15 -->
+        <div class="slide" id="slide-15">
+          <header>Using the http and weboscket packages</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../http/chat.go" `/package/` `/^}/`}}
+-->package main
+
+import (
+    &#34;fmt&#34;
+    &#34;io&#34;
+    &#34;log&#34;
+    &#34;net/http&#34;
+
+    &#34;code.google.com/p/go.net/websocket&#34;
+)
+
+const listenAddr = &#34;localhost:4000&#34;
+
+func main() {
+    http.HandleFunc(&#34;/&#34;, rootHandler)
+    http.Handle(&#34;/socket&#34;, websocket.Handler(socketHandler))
+    err := http.ListenAndServe(listenAddr, nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 15 --><!-- start of slide 16 -->
+        <div class="slide" id="slide-16">
+          <header>Serving the HTML and JavaScript</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../http/chat.go" `/func.rootHandler/` `/^}/`}}
+-->func rootHandler(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte(rootHtml))
+}
+</pre>
+
+<pre>
+<!--{{code "../http/html.go" `/const.rootHtml/` `/<script>/`}}
+-->const rootHtml = `&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&#34;utf-8&#34; /&gt;
+&lt;script&gt;
+</pre>
+
+<pre>
+<!--{{code "../http/html.go" `/websocket.=/` `/onClose/`}}
+-->    websocket = new WebSocket(&#34;ws://` + listenAddr + `/socket&#34;);
+    websocket.onmessage = onMessage;
+    websocket.onclose = onClose;
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 16 --><!-- start of slide 17 -->
+        <div class="slide" id="slide-17">
+          <header>Adding a Socket type</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../http/chat.go" `/type.Socket/` `/^}/`}}
+-->type Socket struct {
+    io.ReadWriter
+    done chan bool
+}
+</pre>
+
+<pre>
+<!--{{code "../http/chat.go" `/func.socketHandler/` `/^}/`}}
+-->func socketHandler(ws *websocket.Conn) {
+    s := Socket{ws, make(chan bool)}
+    go mux(s)
+    &lt;-s.done
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 17 --><!-- start of slide 18 -->
+        <div class="slide" id="slide-18">
+          <header>Adapting the existing code</header>
+
+          <section>
+            <p>
+            Minimal changes to the existing code are needed to use a Socket instead of an io.ReadWriteCloser.<br>
+            </p>
+            
+            <ul>
+            
+            <li>The partner channel now carries Sockets.</li>
+            
+            <li>The mux function is identical except for the type of c.</li>
+            
+            </ul>
+            
+
+
+<pre>
+<!--{{code "../http/chat.go" `/var.partner/`}}
+-->var partner = make(chan Socket)
+</pre>
+
+<pre>
+<!--{{code "../http/chat.go" `/func.mux/` `/^}/`}}
+-->func mux(c Socket) {
+    fmt.Fprint(c, &#34;Waiting for a partner...&#34;)
+    select {
+    case partner &lt;- c:
+        // now handled by the other goroutine
+    case p := &lt;-partner:
+        chat(p, c)
+    }
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 18 --><!-- start of slide 19 -->
+        <div class="slide" id="slide-19">
+          <header>Adapting the existing code</header>
+
+          <section>
+            <p>
+            Instead of calling Close, the chat function sends a value on the done channel, permitting the socketHandler to return.<br>
+            </p>
+            
+
+
+<pre>
+<!--{{code "../http/chat.go" `/func.chat/` `/^}/`}}
+-->func chat(a, b Socket) {
+    fmt.Fprintln(a, &#34;Found one! Say hi.&#34;)
+    fmt.Fprintln(b, &#34;Found one! Say hi.&#34;)
+    errc := make(chan error, 1)
+    go cp(a, b, errc)
+    go cp(b, a, errc)
+    if err := &lt;-errc; err != nil {
+        log.Println(err)
+    }
+    a.done &lt;- true
+    b.done &lt;- true
+}
+</pre>
+
+<pre>
+<!--{{code "../http/chat.go" `/func.socketHandler/` `/^}/`}}
+-->func socketHandler(ws *websocket.Conn) {
+    s := Socket{ws, make(chan bool)}
+    go mux(s)
+    &lt;-s.done
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 19 -->
+
+        <div class="slide" id="goodbye">
+          <section class="middle">
+            <hgroup><img src="http://golang.org/doc/gopher/bumper640x360.png"></hgroup>
+          </section>
+        </div>
+
+      </div>
+
+      <div id="speaker-note" class="invisible" style="display: none;">
+      </div> <!-- speaker note -->
+      <aside id="help" class="sidebar invisible" style="display: hidden;">
+        <table>
+          <caption>Help</caption>
+          <tbody>
+            <tr>
+              <th>Move Around</th>
+              <td>&larr;&nbsp;&rarr;</td>
+            </tr>
+            <tr>
+              <th>Source File</th>
+              <td>s</td>
+            </tr>
+            <tr>
+              <th>Speaker Notes</th>
+              <td>n</td>
+            </tr>
+            <tr>
+              <th>Toggle 3D</th>
+              <td>3</td>
+            </tr>
+            <tr>
+              <th>Help</th>
+              <td>0</td>
+            </tr>
+          </tbody>
+        </table>
+      </aside>
+
+    </div> <!-- presentation -->
+
+    <!--[if lt IE 9]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">
+    </script>
+    <script>CFInstall.check({ mode: "overlay" });</script>
+    <![endif]-->
+
+    <script src="js/utils.js"></script>
+  </body>
+</html>

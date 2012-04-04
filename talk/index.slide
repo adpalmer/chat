@@ -1,0 +1,134 @@
+# This is a file.
+
+Go:
+Code that grows
+with grace
+
+Andrew Gerrand
+adg@golang.org
+Tumblr
+Apr 20, 2012
+
+* Hello, go
+
+You may have heard of Go. It's my favorite language.
+- compiled, compiles fast,
+- statically typed, with 'duck typing' via interfaces,
+- small, with a 'batteries included' standard library,
+- great concurrency support,
+- recently release version 1.
+code ../support/hello.go
+
+* Hello, net
+
+code ../support/hello-net.go
+
+* Interfaces
+
+Hey neato! We can use Fprint to write to a net connection.
+That's because a net.Conn is an io.Writer.
+Put another way: net.Conn is a subset of io.Writer.
+code ../support/hello-net.go /Fprint/
+code ../support/defs.go /Fprint/
+code ../support/defs.go /type.Writer/ /^}/
+code ../support/defs.go /type.Conn/ /^}/
+
+* An echo server
+
+code ../support/echo-no-concurrency.go
+
+* A concurrent echo server
+
+code ../support/echo.go
+
+* Goroutines
+
+TODO: describe goroutines
+
+* "Chat roulette"
+
+In this talk we'll look at a simple program, based on the popular "chat roulette" site.
+
+In short:
+- a user connects,
+- another user connects,
+- what each user types is sent to the other.
+
+* Design
+
+The chat program is similar to the echo program. With echo, we copy a connection's incoming data back to the connection.
+
+For chat, we must copy the incoming data from one user to another.  
+
+Copying the data is easy. As in real life, the hard part is matching one conversation partner with another.
+
+TOOD: diagram
+
+* Channels
+
+TODO: describe channels
+
+* Select
+
+TODO: describe select
+
+* Modifying echo to create chat
+
+In the accept loop, we replace the call to io.Copy with a call to a new function: mux.
+
+code ../support/echo.go /Accept/ /go/
+code ../support/chat-simple.go /Accept/ /go/
+
+* The matcher
+
+The mux function simultaneously tries to send *and* receive a connection on the partner channel.
+- If the send succeeds, the connection has been handed off to another goroutine, so the function exits and the goroutine shuts down.
+- If the receive succeeds, a connection has been received from another goroutine. The current goroutine then has two connections, so it starts a chat session between them.
+
+code ../support/chat-simple.go /var.partner/ /^}/
+
+* The conversation
+
+The chat function sends a greeting to each connection and then copies data from one to the other, and vice versa.
+
+Notice that it launches another goroutine so that the copy operations may happen concurrently.
+
+code ../support/chat-simple.go /func.chat/ /^}/
+
+* Error handling
+
+code ../tcp/chat.go /func.chat/ /^}/
+code ../tcp/chat.go /func.cp/ /^}/
+
+* Taking it to the web 
+
+TODO: describe web version
+
+* Using the http and weboscket packages
+
+code ../http/chat.go /package/ /^}/
+
+* Serving the HTML and JavaScript
+
+code ../http/chat.go /func.rootHandler/ /^}/
+code ../http/html.go /const.rootHtml/ /<script>/
+code ../http/html.go /websocket.=/ /onClose/
+
+* Adding a Socket type
+
+code ../http/chat.go /type.Socket/ /^}/
+code ../http/chat.go /func.socketHandler/ /^}/
+
+* Adapting the existing code
+
+Minimal changes to the existing code are needed to use a Socket instead of an io.ReadWriteCloser.
+- The partner channel now carries Sockets.
+- The mux function is identical except for the type of c.
+code ../http/chat.go /var.partner/
+code ../http/chat.go /func.mux/ /^}/
+
+* Adapting the existing code
+
+Instead of calling Close, the chat function sends a value on the done channel, permitting the socketHandler to return.
+code ../http/chat.go /func.chat/ /^}/
+code ../http/chat.go /func.socketHandler/ /^}/

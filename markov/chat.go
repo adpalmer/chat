@@ -27,7 +27,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 type Socket struct {
 	io.Reader
-	io.WriteCloser
+	io.Writer
 	done chan bool
 }
 
