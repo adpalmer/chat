@@ -95,14 +95,24 @@ Notice that it launches another goroutine so that the copy operations may happen
 
 code ../support/chat-simple.go /func.chat/ /^}/
 
+* Demo
+
 * Error handling
 
 code ../tcp/chat.go /func.chat/ /^}/
 code ../tcp/chat.go /func.cp/ /^}/
 
+* Demo
+
 * Taking it to the web 
 
-TODO: describe web version
+"Cute program," you say, "But who wants to chat via a raw TCP connection?"
+
+Good point. Let's modernize this by turning it a web application.
+
+Instead of TCP sockets, we'll use websockets. Websocket support for Go is available via the websocket package in the net sub-repository.
+
+We'll serve the user interface with Go's built-in "net/http" package.
 
 * Using the http and weboscket packages
 
@@ -110,14 +120,19 @@ code ../http/chat.go /package/ /^}/
 
 * Serving the HTML and JavaScript
 
-code ../http/chat.go /func.rootHandler/ /^}/
-code ../http/html.go /const.rootHtml/ /<script>/
+code ../http/html.go /import/ /<script>/
 code ../http/html.go /websocket.=/ /onClose/
+code ../http/html.go /<\/html>/ $
+code ../http/chat.go /func.rootHandler/ /^}/
 
 * Adding a Socket type
 
 code ../http/chat.go /type.Socket/ /^}/
 code ../http/chat.go /func.socketHandler/ /^}/
+
+* Embedding
+
+TODO: explain
 
 * Adapting the existing code
 
@@ -132,3 +147,46 @@ code ../http/chat.go /func.mux/ /^}/
 Instead of calling Close, the chat function sends a value on the done channel, permitting the socketHandler to return.
 code ../http/chat.go /func.chat/ /^}/
 code ../http/chat.go /func.socketHandler/ /^}/
+
+* Relieving loneliness
+
+What if you connect, but there's noone there?
+
+Wouldn't it be nice if we could synthesize a chat partner?
+
+Let's do it.
+
+* Generating text with markov chains
+
+code ../support/markov.txt
+
+* Generating text with markov chains
+
+Forunately, the Go docs include a markov chain implementation:
+http://golang.org/doc/codewalk/markov/
+
+We'll use a version that has been modified to be safe for concurrent use.
+code ../markov/markov.go /Chain/ /{/
+code ../markov/markov.go /Write/ /{/
+code ../markov/markov.go /Generate/ /{/
+
+* Feeding the chain
+
+We will use all text that enters the system to build the markov chains. To do this we split the Socket into a Reader and a Writer, and feed all incoming data to the Chain instance.
+code ../markov/chat.go /type.Socket/ /^}/
+code ../markov/chat.go /var.chain/ /^}/
+
+* The markov bot
+
+code ../markov/chat.go /markovBot.returns/ /^}/
+
+* Integrating the markov bot
+
+The bot should jump in if a real partner doesn't join.
+To do this, we add a case to the select that triggers after 10 seconds, starting a chat between the user's Socket and a markovBot.
+
+The chat function remains untouched.
+code ../markov/chat.go /func.mux/ /^}/
+
+* Demo
+

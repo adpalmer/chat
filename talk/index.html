@@ -538,6 +538,19 @@ func mux(c io.ReadWriter) {
         </div> <!-- end slide template -->
       <!-- end of slide 12 --><!-- start of slide 13 -->
         <div class="slide" id="slide-13">
+          <header>Demo</header>
+
+          <section>
+            <p></p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 13 --><!-- start of slide 14 -->
+        <div class="slide" id="slide-14">
           <header>Error handling</header>
 
           <section>
@@ -575,13 +588,38 @@ func mux(c io.ReadWriter) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 13 --><!-- start of slide 14 -->
-        <div class="slide" id="slide-14">
+      <!-- end of slide 14 --><!-- start of slide 15 -->
+        <div class="slide" id="slide-15">
+          <header>Demo</header>
+
+          <section>
+            <p></p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 15 --><!-- start of slide 16 -->
+        <div class="slide" id="slide-16">
           <header>Taking it to the web </header>
 
           <section>
             <p>
-            TODO: describe web version<br>
+            &#34;Cute program,&#34; you say, &#34;But who wants to chat via a raw TCP connection?&#34;<br>
+            
+            <br>
+            
+            Good point. Let&#39;s modernize this by turning it a web application.<br>
+            
+            <br>
+            
+            Instead of TCP sockets, we&#39;ll use websockets. Websocket support for Go is available via the websocket package in the net sub-repository.<br>
+            
+            <br>
+            
+            We&#39;ll serve the user interface with Go&#39;s built-in &#34;net/http&#34; package.<br>
             
             <br>
             </p>
@@ -592,8 +630,8 @@ func mux(c io.ReadWriter) {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 14 --><!-- start of slide 15 -->
-        <div class="slide" id="slide-15">
+      <!-- end of slide 16 --><!-- start of slide 17 -->
+        <div class="slide" id="slide-17">
           <header>Using the http and weboscket packages</header>
 
           <section>
@@ -632,8 +670,8 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 15 --><!-- start of slide 16 -->
-        <div class="slide" id="slide-16">
+      <!-- end of slide 17 --><!-- start of slide 18 -->
+        <div class="slide" id="slide-18">
           <header>Serving the HTML and JavaScript</header>
 
           <section>
@@ -642,15 +680,11 @@ func main() {
 
 
 <pre>
-<!--{{code "../http/chat.go" `/func.rootHandler/` `/^}/`}}
--->func rootHandler(w http.ResponseWriter, r *http.Request) {
-    w.Write([]byte(rootHtml))
-}
-</pre>
+<!--{{code "../http/html.go" `/import/` `/<script>/`}}
+-->import &#34;html/template&#34;
 
-<pre>
-<!--{{code "../http/html.go" `/const.rootHtml/` `/<script>/`}}
--->const rootHtml = `&lt;!DOCTYPE html&gt;
+var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
+&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
 &lt;meta charset=&#34;utf-8&#34; /&gt;
@@ -659,9 +693,22 @@ func main() {
 
 <pre>
 <!--{{code "../http/html.go" `/websocket.=/` `/onClose/`}}
--->    websocket = new WebSocket(&#34;ws://` + listenAddr + `/socket&#34;);
+-->    websocket = new WebSocket(&#34;ws://{{.}}/socket&#34;);
     websocket.onmessage = onMessage;
     websocket.onclose = onClose;
+</pre>
+
+<pre>
+<!--{{code "../http/html.go" `/<\/html>/` "$"}}
+-->&lt;/html&gt;
+`))
+</pre>
+
+<pre>
+<!--{{code "../http/chat.go" `/func.rootHandler/` `/^}/`}}
+-->func rootHandler(w http.ResponseWriter, r *http.Request) {
+    rootTemplate.Execute(w, listenAddr)
+}
 </pre>
 
 
@@ -670,8 +717,8 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 16 --><!-- start of slide 17 -->
-        <div class="slide" id="slide-17">
+      <!-- end of slide 18 --><!-- start of slide 19 -->
+        <div class="slide" id="slide-19">
           <header>Adding a Socket type</header>
 
           <section>
@@ -702,8 +749,25 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 17 --><!-- start of slide 18 -->
-        <div class="slide" id="slide-18">
+      <!-- end of slide 19 --><!-- start of slide 20 -->
+        <div class="slide" id="slide-20">
+          <header>Embedding</header>
+
+          <section>
+            <p>
+            TODO: explain<br>
+            
+            <br>
+            </p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 20 --><!-- start of slide 21 -->
+        <div class="slide" id="slide-21">
           <header>Adapting the existing code</header>
 
           <section>
@@ -745,8 +809,8 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 18 --><!-- start of slide 19 -->
-        <div class="slide" id="slide-19">
+      <!-- end of slide 21 --><!-- start of slide 22 -->
+        <div class="slide" id="slide-22">
           <header>Adapting the existing code</header>
 
           <section>
@@ -787,7 +851,244 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 19 -->
+      <!-- end of slide 22 --><!-- start of slide 23 -->
+        <div class="slide" id="slide-23">
+          <header>Relieving loneliness</header>
+
+          <section>
+            <p>
+            What if you connect, but there&#39;s noone there?<br>
+            
+            <br>
+            
+            Wouldn&#39;t it be nice if we could synthesize a chat partner?<br>
+            
+            <br>
+            
+            Let&#39;s do it.<br>
+            
+            <br>
+            </p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 23 --><!-- start of slide 24 -->
+        <div class="slide" id="slide-24">
+          <header>Generating text with markov chains</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../support/markov.txt"}}
+-->Source
+&#34;I am not a number! I am a free man!&#34;
+
+Prefix           Suffix 
+&#34;&#34; &#34;&#34;            &#34;I&#34;
+&#34;&#34; &#34;I&#34;           &#34;am&#34;
+&#34;I&#34; &#34;am&#34;         &#34;a&#34;
+&#34;I&#34; &#34;am&#34;         &#34;not&#34;
+&#34;a&#34; &#34;free&#34;       &#34;man!&#34;
+&#34;am&#34; &#34;a&#34;         &#34;free&#34;
+&#34;am&#34; &#34;not&#34;       &#34;a&#34;
+&#34;a&#34; &#34;number!&#34;    &#34;I&#34;
+&#34;number!&#34; &#34;I&#34;    &#34;am&#34;
+&#34;not&#34; &#34;a&#34;        &#34;number!&#34;
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 24 --><!-- start of slide 25 -->
+        <div class="slide" id="slide-25">
+          <header>Generating text with markov chains</header>
+
+          <section>
+            <p>
+            Forunately, the Go docs include a markov chain implementation:<br>
+            
+            http://golang.org/doc/codewalk/markov/<br>
+            
+            <br>
+            
+            We&#39;ll use a version that has been modified to be safe for concurrent use.<br>
+            </p>
+            
+
+
+<pre>
+<!--{{code "../markov/markov.go" `/Chain/` `/{/`}}
+-->// Chain contains a map (&#34;chain&#34;) of prefixes to a list of suffixes.
+// A prefix is a string of prefixLen words joined with spaces.
+// A suffix is a single word. A prefix can have multiple suffixes.
+type Chain struct {
+</pre>
+
+<pre>
+<!--{{code "../markov/markov.go" `/Write/` `/{/`}}
+-->// Write parses the bytes into prefixes and suffixes that are stored in Chain.
+func (c *Chain) Write(b []byte) (int, error) {
+</pre>
+
+<pre>
+<!--{{code "../markov/markov.go" `/Generate/` `/{/`}}
+-->// Generate returns a string of at most n words generated from Chain.
+func (c *Chain) Generate(n int) string {
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 25 --><!-- start of slide 26 -->
+        <div class="slide" id="slide-26">
+          <header>Feeding the chain</header>
+
+          <section>
+            <p>
+            We will use all text that enters the system to build the markov chains. To do this we split the Socket into a Reader and a Writer, and feed all incoming data to the Chain instance.<br>
+            </p>
+            
+
+
+<pre>
+<!--{{code "../markov/chat.go" `/type.Socket/` `/^}/`}}
+-->type Socket struct {
+    io.Reader
+    io.Writer
+    done chan bool
+}
+</pre>
+
+<pre>
+<!--{{code "../markov/chat.go" `/var.chain/` `/^}/`}}
+-->var chain = NewChain(2) // 2-word prefixes
+
+func socketHandler(ws *websocket.Conn) {
+    r, w := io.Pipe()
+    go func() {
+        _, err := io.Copy(io.MultiWriter(w, chain), ws)
+        w.CloseWithError(err)
+    }()
+    s := Socket{r, ws, make(chan bool)}
+    go mux(s)
+    &lt;-s.done
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 26 --><!-- start of slide 27 -->
+        <div class="slide" id="slide-27">
+          <header>The markov bot</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../markov/chat.go" `/markovBot.returns/` `/^}/`}}
+-->// markovBot returns a Socket that responds to any read by
+// writing a generated sentence.
+func markovBot() Socket {
+    r, out := io.Pipe() // outgoing data
+    in, w := io.Pipe()  // incoming data
+    go func() {
+        b := make([]byte, 1024) // scratch buffer
+        for {
+            if _, err := in.Read(b); err != nil {
+                break
+            }
+            msg := chain.Generate(10) // at most 10 words
+            if _, err := out.Write([]byte(msg)); err != nil {
+                break
+            }
+        }
+    }()
+    done := make(chan bool)
+    go func() {
+        &lt;-done    // block until we get the done signal and then close
+        w.Close() // the pipe, causing the blocking Read above to fail
+    }()
+    return Socket{r, w, done}
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 27 --><!-- start of slide 28 -->
+        <div class="slide" id="slide-28">
+          <header>Integrating the markov bot</header>
+
+          <section>
+            <p>
+            The bot should jump in if a real partner doesn&#39;t join.<br>
+            
+            To do this, we add a case to the select that triggers after 10 seconds, starting a chat between the user&#39;s Socket and a markovBot.<br>
+            
+            <br>
+            
+            The chat function remains untouched.<br>
+            </p>
+            
+
+
+<pre>
+<!--{{code "../markov/chat.go" `/func.mux/` `/^}/`}}
+-->func mux(c Socket) {
+    fmt.Fprint(c, &#34;Waiting for a partner...&#34;)
+    select {
+    case partner &lt;- c:
+        // now handled by the other goroutine
+    case p := &lt;-partner:
+        chat(p, c)
+    case &lt;-time.After(time.Second * 10):
+        chat(markovBot(), c)
+    }
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 28 --><!-- start of slide 29 -->
+        <div class="slide" id="slide-29">
+          <header>Demo</header>
+
+          <section>
+            <p></p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 29 -->
 
         <div class="slide" id="goodbye">
           <section class="middle">

@@ -1,0 +1,14 @@
+Source
+"I am not a number! I am a free man!"
+
+Prefix           Suffix 
+"" ""            "I"
+"" "I"           "am"
+"I" "am"         "a"
+"I" "am"         "not"
+"a" "free"       "man!"
+"am" "a"         "free"
+"am" "not"       "a"
+"a" "number!"    "I"
+"number!" "I"    "am"
+"not" "a"        "number!"
