@@ -1,6 +1,9 @@
 package main
 
-const rootHtml = `<!DOCTYPE html>
+import "html/template"
+
+var rootTemplate = template.Must(template.New("root").Parse(`
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8" />
@@ -41,7 +44,7 @@ function init() {
 
 	output = document.getElementById("output");
 
-	websocket = new WebSocket("ws://` + listenAddr + `/socket");
+	websocket = new WebSocket("ws://{{.}}/socket");
 	websocket.onmessage = onMessage;
 	websocket.onclose = onClose;
 }
@@ -55,4 +58,4 @@ window.addEventListener("load", init, false);
 <div id="output"></div>
 </body>
 </html>
-`
+`))

@@ -22,7 +22,7 @@ func main() {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(rootHtml))
+	rootTemplate.Execute(w, listenAddr)
 }
 
 type Socket struct {
@@ -31,10 +31,12 @@ type Socket struct {
 	done chan bool
 }
 
+var chain = NewChain(2) // 2-word prefixes
+
 func socketHandler(ws *websocket.Conn) {
 	r, w := io.Pipe()
 	go func() {
-		_, err := io.Copy(io.MultiWriter(w, markov), ws)
+		_, err := io.Copy(io.MultiWriter(w, chain), ws)
 		w.CloseWithError(err)
 	}()
 	s := Socket{r, ws, make(chan bool)}
@@ -42,15 +44,7 @@ func socketHandler(ws *websocket.Conn) {
 	<-s.done
 }
 
-var (
-	partner = make(chan Socket)
-	markov  = NewChain(3)
-)
-
-const (
-	markovDelay = 10 * time.Second
-	markovWords = 10
-)
+var partner = make(chan Socket)
 
 func mux(c Socket) {
 	fmt.Fprint(c, "Waiting for a partner...")
@@ -59,7 +53,7 @@ func mux(c Socket) {
 		// now handled by the other goroutine
 	case p := <-partner:
 		chat(p, c)
-	case <-time.After(markovDelay):
+	case <-time.After(time.Second * 10):
 		chat(markovBot(), c)
 	}
 }
@@ -82,16 +76,18 @@ func cp(w io.Writer, r io.Reader, errc chan<- error) {
 	errc <- err
 }
 
+// markovBot returns a Socket that responds to any read by
+// writing a generated sentence.
 func markovBot() Socket {
-	r, out := io.Pipe()
-	in, w := io.Pipe()
+	r, out := io.Pipe() // outgoing data
+	in, w := io.Pipe()  // incoming data
 	go func() {
-		b := make([]byte, 1024)
+		b := make([]byte, 1024) // scratch buffer
 		for {
 			if _, err := in.Read(b); err != nil {
 				break
 			}
-			msg := markov.Generate(markovWords)
+			msg := chain.Generate(10) // at most 10 words
 			if _, err := out.Write([]byte(msg)); err != nil {
 				break
 			}
@@ -99,8 +95,8 @@ func markovBot() Socket {
 	}()
 	done := make(chan bool)
 	go func() {
-		<-done
-		w.Close()
+		<-done    // block until we get the done signal and then close
+		w.Close() // the pipe, causing the blocking Read above to fail
 	}()
 	return Socket{r, w, done}
 }

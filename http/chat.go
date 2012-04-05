@@ -21,7 +21,7 @@ func main() {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(rootHtml))
+	rootTemplate.Execute(w, listenAddr)
 }
 
 type Socket struct {
