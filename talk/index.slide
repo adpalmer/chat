@@ -11,12 +11,13 @@ Apr 20, 2012
 
 * Hello, go
 
-You may have heard of Go. It's my favorite language.
-- compiled, compiles fast,
-- statically typed, with 'duck typing' via interfaces,
-- small, with a 'batteries included' standard library,
-- great concurrency support,
-- recently release version 1.
+You may have heard of Go.
+It's my favorite language. I think you'll like it, too.
+- Compiled, and compiles fast,
+- Statically typed, with 'duck typing' via interfaces,
+- Small language, with a 'batteries included' standard library,
+- Great concurrency support,
+- Recently hit version 1.
 code ../support/hello.go
 
 * Hello, net
@@ -25,11 +26,11 @@ code ../support/hello-net.go
 
 * Interfaces
 
-Hey neato! We can use Fprint to write to a net connection.
-That's because a net.Conn is an io.Writer.
-Put another way: net.Conn is a subset of io.Writer.
-code ../support/hello-net.go /Fprint/
-code ../support/defs.go /Fprint/
+Hey neato! We can use Fprintln to write to a net connection.
+That's because a Fprintln writes to an io.Writer,
+and net.Conn is an io.Writer.
+code ../support/hello-net.go /Fprintln/
+code ../support/defs.go /Fprintln/
 code ../support/defs.go /type.Writer/ /^}/
 code ../support/defs.go /type.Conn/ /^}/
 
@@ -37,13 +38,22 @@ code ../support/defs.go /type.Conn/ /^}/
 
 code ../support/echo-no-concurrency.go
 
-* A concurrent echo server
+* A closer look at io.Copy
 
-code ../support/echo.go
+code ../support/echo-no-concurrency.go /Copy/
+code ../support/defs.go /Copy/ /func/
+code ../support/defs.go /type.Conn/ /^}/
+code ../support/defs.go /type.Writer/ /^}/
+code ../support/defs.go /type.Reader/ /^}/
 
 * Goroutines
 
-TODO: describe goroutines
+Goroutines are lightweight threads that are managed by the Go runtime. To run a function in a new goroutine, put "go" before the function call.
+code ../support/goroutines.go
+
+* A concurrent echo server
+
+code ../support/echo.go
 
 * "Chat roulette"
 
@@ -52,13 +62,13 @@ In this talk we'll look at a simple program, based on the popular "chat roulette
 In short:
 - a user connects,
 - another user connects,
-- what each user types is sent to the other.
+- everything one user types is sent to the other.
 
 * Design
 
-The chat program is similar to the echo program. With echo, we copy a connection's incoming data back to the connection.
+The chat program is similar to the echo program. With echo, we copy a connection's incoming data back to the same connection.
 
-For chat, we must copy the incoming data from one user to another.  
+For chat, we must copy the incoming data from one user's connection to another's.
 
 Copying the data is easy. As in real life, the hard part is matching one conversation partner with another.
 

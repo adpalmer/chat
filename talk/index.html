@@ -106,20 +106,22 @@
 
           <section>
             <p>
-            You may have heard of Go. It&#39;s my favorite language.<br>
+            You may have heard of Go.<br>
+            
+            It&#39;s my favorite language. I think you&#39;ll like it, too.<br>
             </p>
             
             <ul>
             
-            <li>compiled, compiles fast,</li>
+            <li>Compiled, and compiles fast,</li>
             
-            <li>statically typed, with &#39;duck typing&#39; via interfaces,</li>
+            <li>Statically typed, with &#39;duck typing&#39; via interfaces,</li>
             
-            <li>small, with a &#39;batteries included&#39; standard library,</li>
+            <li>Small language, with a &#39;batteries included&#39; standard library,</li>
             
-            <li>great concurrency support,</li>
+            <li>Great concurrency support,</li>
             
-            <li>recently release version 1.</li>
+            <li>Recently hit version 1.</li>
             
             </ul>
             
@@ -191,23 +193,23 @@ func main() {
 
           <section>
             <p>
-            Hey neato! We can use Fprint to write to a net connection.<br>
+            Hey neato! We can use Fprintln to write to a net connection.<br>
             
-            That&#39;s because a net.Conn is an io.Writer.<br>
+            That&#39;s because a Fprintln writes to an io.Writer,<br>
             
-            Put another way: net.Conn is a subset of io.Writer.<br>
+            and net.Conn is an io.Writer.<br>
             </p>
             
 
 
 <pre>
-<!--{{code "../support/hello-net.go" `/Fprint/`}}
+<!--{{code "../support/hello-net.go" `/Fprintln/`}}
 -->        fmt.Fprintln(c, &#34;Hello!&#34;)
 </pre>
 
 <pre>
-<!--{{code "../support/defs.go" `/Fprint/`}}
--->func Fprint(w io.Writer, a ...interface{}) (n int, err error)
+<!--{{code "../support/defs.go" `/Fprintln/`}}
+-->func Fprintln(w io.Writer, a ...interface{}) (n int, err error)
 </pre>
 
 <pre>
@@ -277,6 +279,97 @@ func main() {
         </div> <!-- end slide template -->
       <!-- end of slide 3 --><!-- start of slide 4 -->
         <div class="slide" id="slide-4">
+          <header>A closer look at io.Copy</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../support/echo-no-concurrency.go" `/Copy/`}}
+-->        io.Copy(c, c)
+</pre>
+
+<pre>
+<!--{{code "../support/defs.go" `/Copy/` `/func/`}}
+-->// Copy copies from src to dst until either EOF is reached
+// on src or an error occurs.  It returns the number of bytes
+// copied and the first error encountered while copying, if any.
+func Copy(dst Writer, src Reader) (written int64, err error)
+</pre>
+
+<pre>
+<!--{{code "../support/defs.go" `/type.Conn/` `/^}/`}}
+-->type Conn interface {
+    Read(b []byte) (n int, err error)
+    Write(b []byte) (n int, err error)
+    Close() error
+    // ... some additional methods omitted ...
+}
+</pre>
+
+<pre>
+<!--{{code "../support/defs.go" `/type.Writer/` `/^}/`}}
+-->type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+</pre>
+
+<pre>
+<!--{{code "../support/defs.go" `/type.Reader/` `/^}/`}}
+-->type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 4 --><!-- start of slide 5 -->
+        <div class="slide" id="slide-5">
+          <header>Goroutines</header>
+
+          <section>
+            <p>
+            Goroutines are lightweight threads that are managed by the Go runtime. To run a function in a new goroutine, put &#34;go&#34; before the function call.<br>
+            </p>
+            
+
+
+<pre>
+<!--{{code "../support/goroutines.go"}}
+-->package main
+
+import (
+    &#34;fmt&#34;
+    &#34;time&#34;
+)
+
+func main() {
+    go say(&#34;let&#39;s go!&#34;, 3)
+    go say(&#34;ho!&#34;, 2)
+    go say(&#34;hey!&#34;, 1)
+    time.Sleep(4 * time.Second)
+}
+
+func say(text string, secs int) {
+    time.Sleep(time.Duration(secs) * time.Second)
+    fmt.Println(text)
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 5 --><!-- start of slide 6 -->
+        <div class="slide" id="slide-6">
           <header>A concurrent echo server</header>
 
           <section>
@@ -317,25 +410,8 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 4 --><!-- start of slide 5 -->
-        <div class="slide" id="slide-5">
-          <header>Goroutines</header>
-
-          <section>
-            <p>
-            TODO: describe goroutines<br>
-            
-            <br>
-            </p>
-            
-
-
-
-            <p>
-          </section>
-        </div> <!-- end slide template -->
-      <!-- end of slide 5 --><!-- start of slide 6 -->
-        <div class="slide" id="slide-6">
+      <!-- end of slide 6 --><!-- start of slide 7 -->
+        <div class="slide" id="slide-7">
           <header>&#34;Chat roulette&#34;</header>
 
           <section>
@@ -353,7 +429,7 @@ func main() {
             
             <li>another user connects,</li>
             
-            <li>what each user types is sent to the other.</li>
+            <li>everything one user types is sent to the other.</li>
             
             </ul>
             
@@ -363,17 +439,17 @@ func main() {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 6 --><!-- start of slide 7 -->
-        <div class="slide" id="slide-7">
+      <!-- end of slide 7 --><!-- start of slide 8 -->
+        <div class="slide" id="slide-8">
           <header>Design</header>
 
           <section>
             <p>
-            The chat program is similar to the echo program. With echo, we copy a connection&#39;s incoming data back to the connection.<br>
+            The chat program is similar to the echo program. With echo, we copy a connection&#39;s incoming data back to the same connection.<br>
             
             <br>
             
-            For chat, we must copy the incoming data from one user to another.  <br>
+            For chat, we must copy the incoming data from one user&#39;s connection to another&#39;s.<br>
             
             <br>
             
@@ -392,8 +468,8 @@ func main() {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 7 --><!-- start of slide 8 -->
-        <div class="slide" id="slide-8">
+      <!-- end of slide 8 --><!-- start of slide 9 -->
+        <div class="slide" id="slide-9">
           <header>Channels</header>
 
           <section>
@@ -409,8 +485,8 @@ func main() {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 8 --><!-- start of slide 9 -->
-        <div class="slide" id="slide-9">
+      <!-- end of slide 9 --><!-- start of slide 10 -->
+        <div class="slide" id="slide-10">
           <header>Select</header>
 
           <section>
@@ -426,8 +502,8 @@ func main() {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 9 --><!-- start of slide 10 -->
-        <div class="slide" id="slide-10">
+      <!-- end of slide 10 --><!-- start of slide 11 -->
+        <div class="slide" id="slide-11">
           <header>Modifying echo to create chat</header>
 
           <section>
@@ -463,8 +539,8 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 10 --><!-- start of slide 11 -->
-        <div class="slide" id="slide-11">
+      <!-- end of slide 11 --><!-- start of slide 12 -->
+        <div class="slide" id="slide-12">
           <header>The matcher</header>
 
           <section>
@@ -503,8 +579,8 @@ func mux(c io.ReadWriter) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 11 --><!-- start of slide 12 -->
-        <div class="slide" id="slide-12">
+      <!-- end of slide 12 --><!-- start of slide 13 -->
+        <div class="slide" id="slide-13">
           <header>The conversation</header>
 
           <section>
@@ -536,8 +612,8 @@ func mux(c io.ReadWriter) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 12 --><!-- start of slide 13 -->
-        <div class="slide" id="slide-13">
+      <!-- end of slide 13 --><!-- start of slide 14 -->
+        <div class="slide" id="slide-14">
           <header>Demo</header>
 
           <section>
@@ -549,8 +625,8 @@ func mux(c io.ReadWriter) {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 13 --><!-- start of slide 14 -->
-        <div class="slide" id="slide-14">
+      <!-- end of slide 14 --><!-- start of slide 15 -->
+        <div class="slide" id="slide-15">
           <header>Error handling</header>
 
           <section>
@@ -588,8 +664,8 @@ func mux(c io.ReadWriter) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 14 --><!-- start of slide 15 -->
-        <div class="slide" id="slide-15">
+      <!-- end of slide 15 --><!-- start of slide 16 -->
+        <div class="slide" id="slide-16">
           <header>Demo</header>
 
           <section>
@@ -601,8 +677,8 @@ func mux(c io.ReadWriter) {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 15 --><!-- start of slide 16 -->
-        <div class="slide" id="slide-16">
+      <!-- end of slide 16 --><!-- start of slide 17 -->
+        <div class="slide" id="slide-17">
           <header>Taking it to the web </header>
 
           <section>
@@ -630,8 +706,8 @@ func mux(c io.ReadWriter) {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 16 --><!-- start of slide 17 -->
-        <div class="slide" id="slide-17">
+      <!-- end of slide 17 --><!-- start of slide 18 -->
+        <div class="slide" id="slide-18">
           <header>Using the http and weboscket packages</header>
 
           <section>
@@ -670,8 +746,8 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 17 --><!-- start of slide 18 -->
-        <div class="slide" id="slide-18">
+      <!-- end of slide 18 --><!-- start of slide 19 -->
+        <div class="slide" id="slide-19">
           <header>Serving the HTML and JavaScript</header>
 
           <section>
@@ -717,8 +793,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 18 --><!-- start of slide 19 -->
-        <div class="slide" id="slide-19">
+      <!-- end of slide 19 --><!-- start of slide 20 -->
+        <div class="slide" id="slide-20">
           <header>Adding a Socket type</header>
 
           <section>
@@ -749,8 +825,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 19 --><!-- start of slide 20 -->
-        <div class="slide" id="slide-20">
+      <!-- end of slide 20 --><!-- start of slide 21 -->
+        <div class="slide" id="slide-21">
           <header>Embedding</header>
 
           <section>
@@ -766,8 +842,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 20 --><!-- start of slide 21 -->
-        <div class="slide" id="slide-21">
+      <!-- end of slide 21 --><!-- start of slide 22 -->
+        <div class="slide" id="slide-22">
           <header>Adapting the existing code</header>
 
           <section>
@@ -809,8 +885,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 21 --><!-- start of slide 22 -->
-        <div class="slide" id="slide-22">
+      <!-- end of slide 22 --><!-- start of slide 23 -->
+        <div class="slide" id="slide-23">
           <header>Adapting the existing code</header>
 
           <section>
@@ -851,8 +927,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 22 --><!-- start of slide 23 -->
-        <div class="slide" id="slide-23">
+      <!-- end of slide 23 --><!-- start of slide 24 -->
+        <div class="slide" id="slide-24">
           <header>Relieving loneliness</header>
 
           <section>
@@ -876,8 +952,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 23 --><!-- start of slide 24 -->
-        <div class="slide" id="slide-24">
+      <!-- end of slide 24 --><!-- start of slide 25 -->
+        <div class="slide" id="slide-25">
           <header>Generating text with markov chains</header>
 
           <section>
@@ -909,8 +985,8 @@ Prefix           Suffix
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 24 --><!-- start of slide 25 -->
-        <div class="slide" id="slide-25">
+      <!-- end of slide 25 --><!-- start of slide 26 -->
+        <div class="slide" id="slide-26">
           <header>Generating text with markov chains</header>
 
           <section>
@@ -952,8 +1028,8 @@ func (c *Chain) Generate(n int) string {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 25 --><!-- start of slide 26 -->
-        <div class="slide" id="slide-26">
+      <!-- end of slide 26 --><!-- start of slide 27 -->
+        <div class="slide" id="slide-27">
           <header>Feeding the chain</header>
 
           <section>
@@ -994,8 +1070,8 @@ func socketHandler(ws *websocket.Conn) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 26 --><!-- start of slide 27 -->
-        <div class="slide" id="slide-27">
+      <!-- end of slide 27 --><!-- start of slide 28 -->
+        <div class="slide" id="slide-28">
           <header>The markov bot</header>
 
           <section>
@@ -1037,8 +1113,8 @@ func markovBot() Socket {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 27 --><!-- start of slide 28 -->
-        <div class="slide" id="slide-28">
+      <!-- end of slide 28 --><!-- start of slide 29 -->
+        <div class="slide" id="slide-29">
           <header>Integrating the markov bot</header>
 
           <section>
@@ -1075,8 +1151,8 @@ func markovBot() Socket {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 28 --><!-- start of slide 29 -->
-        <div class="slide" id="slide-29">
+      <!-- end of slide 29 --><!-- start of slide 30 -->
+        <div class="slide" id="slide-30">
           <header>Demo</header>
 
           <section>
@@ -1088,7 +1164,7 @@ func markovBot() Socket {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 29 -->
+      <!-- end of slide 30 -->
 
         <div class="slide" id="goodbye">
           <section class="middle">
