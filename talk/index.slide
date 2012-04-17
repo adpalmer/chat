@@ -72,15 +72,18 @@ For chat, we must copy the incoming data from one user's connection to another's
 
 Copying the data is easy. As in real life, the hard part is matching one conversation partner with another.
 
-TOOD: diagram
+* Design diagram
+
+image diagrams.png
 
 * Channels
 
-TODO: describe channels
+Goroutines communicate via channels. A channel is a typed conduit, like a Unix pipe. Channels may be synchronous (unbuffered) or asynchronous (buffered).
+code ../support/chan.go
 
 * Select
 
-TODO: describe select
+code ../support/select.go
 
 * Modifying echo to create chat
 
@@ -91,7 +94,7 @@ code ../support/chat-simple.go /Accept/ /go/
 
 * The matcher
 
-The mux function simultaneously tries to send *and* receive a connection on the partner channel.
+The mux function simultaneously tries to send and receive a connection on a channel.
 - If the send succeeds, the connection has been handed off to another goroutine, so the function exits and the goroutine shuts down.
 - If the receive succeeds, a connection has been received from another goroutine. The current goroutine then has two connections, so it starts a chat session between them.
 

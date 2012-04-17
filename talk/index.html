@@ -456,10 +456,6 @@ func main() {
             Copying the data is easy. As in real life, the hard part is matching one conversation partner with another.<br>
             
             <br>
-            
-            TOOD: diagram<br>
-            
-            <br>
             </p>
             
 
@@ -470,40 +466,102 @@ func main() {
         </div> <!-- end slide template -->
       <!-- end of slide 8 --><!-- start of slide 9 -->
         <div class="slide" id="slide-9">
-          <header>Channels</header>
+          <header>Design diagram</header>
 
           <section>
-            <p>
-            TODO: describe channels<br>
+            <p></p>
             
+
+
+
+<img src="diagrams.png" >
+
+            <p>
             <br>
-            </p>
             
-
-
-
-            <p>
           </section>
         </div> <!-- end slide template -->
       <!-- end of slide 9 --><!-- start of slide 10 -->
         <div class="slide" id="slide-10">
-          <header>Select</header>
+          <header>Channels</header>
 
           <section>
             <p>
-            TODO: describe select<br>
-            
-            <br>
+            Goroutines communicate via channels. A channel is a typed conduit, like a Unix pipe. Channels may be synchronous (unbuffered) or asynchronous (buffered).<br>
             </p>
             
 
 
+<pre>
+<!--{{code "../support/chan.go"}}
+-->package main
+
+import &#34;fmt&#34;
+
+func main() {
+    ch := make(chan int)
+    go fibs(ch)
+    for {
+        fmt.Println(&lt;-ch)
+    }
+}
+
+func fibs(ch chan int) {
+    i, j := 0, 1
+    for {
+        ch &lt;- j
+        i, j = j, i+j
+    }
+}
+</pre>
+
 
             <p>
+            <br>
+            
           </section>
         </div> <!-- end slide template -->
       <!-- end of slide 10 --><!-- start of slide 11 -->
         <div class="slide" id="slide-11">
+          <header>Select</header>
+
+          <section>
+            <p></p>
+            
+
+
+<pre>
+<!--{{code "../support/select.go"}}
+-->package main
+
+import (
+    &#34;fmt&#34;
+    &#34;time&#34;
+)
+
+func main() {
+    ticker := time.NewTicker(time.Millisecond * 250)
+    boom := time.After(time.Second * 1)
+    for {
+        select {
+        case &lt;-ticker.C:
+            fmt.Println(&#34;tick&#34;)
+        case &lt;-boom:
+            fmt.Println(&#34;boom!&#34;)
+            return
+        }
+    }
+}
+</pre>
+
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 11 --><!-- start of slide 12 -->
+        <div class="slide" id="slide-12">
           <header>Modifying echo to create chat</header>
 
           <section>
@@ -539,13 +597,13 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 11 --><!-- start of slide 12 -->
-        <div class="slide" id="slide-12">
+      <!-- end of slide 12 --><!-- start of slide 13 -->
+        <div class="slide" id="slide-13">
           <header>The matcher</header>
 
           <section>
             <p>
-            The mux function simultaneously tries to send *and* receive a connection on the partner channel.<br>
+            The mux function simultaneously tries to send and receive a connection on a channel.<br>
             </p>
             
             <ul>
@@ -579,8 +637,8 @@ func mux(c io.ReadWriter) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 12 --><!-- start of slide 13 -->
-        <div class="slide" id="slide-13">
+      <!-- end of slide 13 --><!-- start of slide 14 -->
+        <div class="slide" id="slide-14">
           <header>The conversation</header>
 
           <section>
@@ -612,8 +670,8 @@ func mux(c io.ReadWriter) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 13 --><!-- start of slide 14 -->
-        <div class="slide" id="slide-14">
+      <!-- end of slide 14 --><!-- start of slide 15 -->
+        <div class="slide" id="slide-15">
           <header>Demo</header>
 
           <section>
@@ -625,8 +683,8 @@ func mux(c io.ReadWriter) {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 14 --><!-- start of slide 15 -->
-        <div class="slide" id="slide-15">
+      <!-- end of slide 15 --><!-- start of slide 16 -->
+        <div class="slide" id="slide-16">
           <header>Error handling</header>
 
           <section>
@@ -664,8 +722,8 @@ func mux(c io.ReadWriter) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 15 --><!-- start of slide 16 -->
-        <div class="slide" id="slide-16">
+      <!-- end of slide 16 --><!-- start of slide 17 -->
+        <div class="slide" id="slide-17">
           <header>Demo</header>
 
           <section>
@@ -677,8 +735,8 @@ func mux(c io.ReadWriter) {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 16 --><!-- start of slide 17 -->
-        <div class="slide" id="slide-17">
+      <!-- end of slide 17 --><!-- start of slide 18 -->
+        <div class="slide" id="slide-18">
           <header>Taking it to the web </header>
 
           <section>
@@ -706,8 +764,8 @@ func mux(c io.ReadWriter) {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 17 --><!-- start of slide 18 -->
-        <div class="slide" id="slide-18">
+      <!-- end of slide 18 --><!-- start of slide 19 -->
+        <div class="slide" id="slide-19">
           <header>Using the http and weboscket packages</header>
 
           <section>
@@ -746,8 +804,8 @@ func main() {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 18 --><!-- start of slide 19 -->
-        <div class="slide" id="slide-19">
+      <!-- end of slide 19 --><!-- start of slide 20 -->
+        <div class="slide" id="slide-20">
           <header>Serving the HTML and JavaScript</header>
 
           <section>
@@ -793,8 +851,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 19 --><!-- start of slide 20 -->
-        <div class="slide" id="slide-20">
+      <!-- end of slide 20 --><!-- start of slide 21 -->
+        <div class="slide" id="slide-21">
           <header>Adding a Socket type</header>
 
           <section>
@@ -825,8 +883,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 20 --><!-- start of slide 21 -->
-        <div class="slide" id="slide-21">
+      <!-- end of slide 21 --><!-- start of slide 22 -->
+        <div class="slide" id="slide-22">
           <header>Embedding</header>
 
           <section>
@@ -842,8 +900,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 21 --><!-- start of slide 22 -->
-        <div class="slide" id="slide-22">
+      <!-- end of slide 22 --><!-- start of slide 23 -->
+        <div class="slide" id="slide-23">
           <header>Adapting the existing code</header>
 
           <section>
@@ -885,8 +943,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 22 --><!-- start of slide 23 -->
-        <div class="slide" id="slide-23">
+      <!-- end of slide 23 --><!-- start of slide 24 -->
+        <div class="slide" id="slide-24">
           <header>Adapting the existing code</header>
 
           <section>
@@ -927,8 +985,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 23 --><!-- start of slide 24 -->
-        <div class="slide" id="slide-24">
+      <!-- end of slide 24 --><!-- start of slide 25 -->
+        <div class="slide" id="slide-25">
           <header>Relieving loneliness</header>
 
           <section>
@@ -952,8 +1010,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 24 --><!-- start of slide 25 -->
-        <div class="slide" id="slide-25">
+      <!-- end of slide 25 --><!-- start of slide 26 -->
+        <div class="slide" id="slide-26">
           <header>Generating text with markov chains</header>
 
           <section>
@@ -985,8 +1043,8 @@ Prefix           Suffix
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 25 --><!-- start of slide 26 -->
-        <div class="slide" id="slide-26">
+      <!-- end of slide 26 --><!-- start of slide 27 -->
+        <div class="slide" id="slide-27">
           <header>Generating text with markov chains</header>
 
           <section>
@@ -1028,8 +1086,8 @@ func (c *Chain) Generate(n int) string {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 26 --><!-- start of slide 27 -->
-        <div class="slide" id="slide-27">
+      <!-- end of slide 27 --><!-- start of slide 28 -->
+        <div class="slide" id="slide-28">
           <header>Feeding the chain</header>
 
           <section>
@@ -1070,8 +1128,8 @@ func socketHandler(ws *websocket.Conn) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 27 --><!-- start of slide 28 -->
-        <div class="slide" id="slide-28">
+      <!-- end of slide 28 --><!-- start of slide 29 -->
+        <div class="slide" id="slide-29">
           <header>The markov bot</header>
 
           <section>
@@ -1113,8 +1171,8 @@ func markovBot() Socket {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 28 --><!-- start of slide 29 -->
-        <div class="slide" id="slide-29">
+      <!-- end of slide 29 --><!-- start of slide 30 -->
+        <div class="slide" id="slide-30">
           <header>Integrating the markov bot</header>
 
           <section>
@@ -1151,8 +1209,8 @@ func markovBot() Socket {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 29 --><!-- start of slide 30 -->
-        <div class="slide" id="slide-30">
+      <!-- end of slide 30 --><!-- start of slide 31 -->
+        <div class="slide" id="slide-31">
           <header>Demo</header>
 
           <section>
@@ -1164,7 +1222,7 @@ func markovBot() Socket {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 30 -->
+      <!-- end of slide 31 -->
 
         <div class="slide" id="goodbye">
           <section class="middle">
