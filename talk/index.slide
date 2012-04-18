@@ -198,3 +198,11 @@ code ../markov/chat.go /func.mux/ /^}/
 
 * Demo
 
+* The end
+
+More about Go: http://golang.org/
+
+This talk: http://github.com/nf/chat
+
+Me: adg@golang.org
+
