@@ -526,7 +526,9 @@ func fibs(ch chan int) {
           <header>Select</header>
 
           <section>
-            <p></p>
+            <p>
+            A select block is like a switch, but it selects exactly one channel operation.<br>
+            </p>
             
 
 
@@ -856,9 +858,20 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
           <header>Adding a socket type</header>
 
           <section>
-            <p></p>
+            <p>
+            We can&#39;t just use a websocket.Conn instead of the net.Conn, because a websocket.Conn is held open by its handler function. Here we use a channel to keep the handler running until the socket&#39;s Close method is called.<br>
+            </p>
             
 
+
+<pre>
+<!--{{code "../http/chat.go" `/func.socketHandler/` `/^}/`}}
+-->func socketHandler(ws *websocket.Conn) {
+    s := socket{ws, make(chan bool)}
+    go mux(s)
+    &lt;-s.done
+}
+</pre>
 
 <pre>
 <!--{{code "../http/chat.go" `/type.socket/` `/^}/`}}
@@ -876,12 +889,38 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
 }
 </pre>
 
+
+            <p>
+            <br>
+            
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 21 --><!-- start of slide 22 -->
+        <div class="slide" id="slide-22">
+          <header>Struct embedding</header>
+
+          <section>
+            <p>
+            Go supports a kind of &#34;mix-in&#34; functionality with a feature known as &#34;struct embedding&#34;. The embedding struct inherits the embedded type&#39;s methods.<br>
+            </p>
+            
+
+
 <pre>
-<!--{{code "../http/chat.go" `/func.socketHandler/` `/^}/`}}
--->func socketHandler(ws *websocket.Conn) {
-    s := socket{ws, make(chan bool)}
-    go mux(s)
-    &lt;-s.done
+<!--{{code "../support/embed.go" `/type/` "$"}}
+-->type A struct {
+    B
+}
+
+type B struct{}
+
+func (b B) String() string {
+    return &#34;B comes after A&#34;
+}
+
+func main() {
+    var a A
+    fmt.Println(a) // Println calls String to format a
 }
 </pre>
 
@@ -891,16 +930,12 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 21 --><!-- start of slide 22 -->
-        <div class="slide" id="slide-22">
-          <header>Embedding</header>
+      <!-- end of slide 22 --><!-- start of slide 23 -->
+        <div class="slide" id="slide-23">
+          <header>Demo</header>
 
           <section>
-            <p>
-            TODO: explain<br>
-            
-            <br>
-            </p>
+            <p></p>
             
 
 
@@ -908,8 +943,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 22 --><!-- start of slide 23 -->
-        <div class="slide" id="slide-23">
+      <!-- end of slide 23 --><!-- start of slide 24 -->
+        <div class="slide" id="slide-24">
           <header>Relieving loneliness</header>
 
           <section>
@@ -933,8 +968,8 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 23 --><!-- start of slide 24 -->
-        <div class="slide" id="slide-24">
+      <!-- end of slide 24 --><!-- start of slide 25 -->
+        <div class="slide" id="slide-25">
           <header>Generating text with markov chains</header>
 
           <section>
@@ -966,8 +1001,8 @@ Prefix           Suffix
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 24 --><!-- start of slide 25 -->
-        <div class="slide" id="slide-25">
+      <!-- end of slide 25 --><!-- start of slide 26 -->
+        <div class="slide" id="slide-26">
           <header>Generating text with markov chains</header>
 
           <section>
@@ -1009,8 +1044,8 @@ func (c *Chain) Generate(n int) string {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 25 --><!-- start of slide 26 -->
-        <div class="slide" id="slide-26">
+      <!-- end of slide 26 --><!-- start of slide 27 -->
+        <div class="slide" id="slide-27">
           <header>Feeding the chain</header>
 
           <section>
@@ -1051,8 +1086,8 @@ func socketHandler(ws *websocket.Conn) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 26 --><!-- start of slide 27 -->
-        <div class="slide" id="slide-27">
+      <!-- end of slide 27 --><!-- start of slide 28 -->
+        <div class="slide" id="slide-28">
           <header>The markov bot</header>
 
           <section>
@@ -1061,8 +1096,10 @@ func socketHandler(ws *websocket.Conn) {
 
 
 <pre>
-<!--{{code "../markov/chat.go" `/func.Bot/` `/^}/`}}
--->func Bot() io.ReadWriteCloser {
+<!--{{code "../markov/chat.go" `/\/\/.Bot/` `/^}/`}}
+-->// Bot returns an io.ReadWriteCloser that responds to
+// each incoming write with a generated sentence.
+func Bot() io.ReadWriteCloser {
     r, out := io.Pipe() // for outgoing data
     return bot{r, out}
 }
@@ -1099,8 +1136,8 @@ func socketHandler(ws *websocket.Conn) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 27 --><!-- start of slide 28 -->
-        <div class="slide" id="slide-28">
+      <!-- end of slide 28 --><!-- start of slide 29 -->
+        <div class="slide" id="slide-29">
           <header>Integrating the markov bot</header>
 
           <section>
@@ -1137,8 +1174,8 @@ func socketHandler(ws *websocket.Conn) {
             
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 28 --><!-- start of slide 29 -->
-        <div class="slide" id="slide-29">
+      <!-- end of slide 29 --><!-- start of slide 30 -->
+        <div class="slide" id="slide-30">
           <header>Demo</header>
 
           <section>
@@ -1150,7 +1187,7 @@ func socketHandler(ws *websocket.Conn) {
             <p>
           </section>
         </div> <!-- end slide template -->
-      <!-- end of slide 29 -->
+      <!-- end of slide 30 -->
 
         <div class="slide" id="goodbye">
           <section class="middle">

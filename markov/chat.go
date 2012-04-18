@@ -82,7 +82,7 @@ func cp(w io.Writer, r io.Reader, errc chan<- error) {
 }
 
 // Bot returns an io.ReadWriteCloser that responds to
-// any incoming writes by writing a generated sentence.
+// each incoming write with a generated sentence.
 func Bot() io.ReadWriteCloser {
 	r, out := io.Pipe() // for outgoing data
 	return bot{r, out}

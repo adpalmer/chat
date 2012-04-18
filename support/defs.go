@@ -34,44 +34,44 @@ type Writer interface {
 // that happen after reading some bytes and also both of the
 // allowed EOF behaviors.
 type Reader interface {
-    Read(p []byte) (n int, err error)
+	Read(p []byte) (n int, err error)
 }
 
 // ReadWriter is the interface that groups the basic Read and Write methods.
 type ReadWriter interface {
-    Reader
-    // contains filtered or unexported methods
+	Reader
+	// contains filtered or unexported methods
 }
 
 // ReadCloser is the interface that groups the basic Read and Close methods.
 type ReadCloser interface {
-    Reader
-    // contains filtered or unexported methods
+	Reader
+	// contains filtered or unexported methods
 }
 
 // ReadWriteCloser is the interface that groups the basic Read, Write and Close methods.
 type ReadWriteCloser interface {
-    Reader
-    // contains filtered or unexported methods
+	Reader
+	// contains filtered or unexported methods
 }
 
 // ReadSeeker is the interface that groups the basic Read and Seek methods.
 type ReadSeeker interface {
-    Reader
-    // contains filtered or unexported methods
+	Reader
+	// contains filtered or unexported methods
 }
 
 // ReadWriteSeeker is the interface that groups the basic Read, Write and Seek methods.
 type ReadWriteSeeker interface {
-    Reader
-    // contains filtered or unexported methods
+	Reader
+	// contains filtered or unexported methods
 }
 
 type Conn interface {
-    Read(b []byte) (n int, err error)
-    Write(b []byte) (n int, err error)
-    Close() error
-    // ... some additional methods omitted ...
+	Read(b []byte) (n int, err error)
+	Write(b []byte) (n int, err error)
+	Close() error
+	// ... some additional methods omitted ...
 }
 
 // Copy copies from src to dst until either EOF is reached
