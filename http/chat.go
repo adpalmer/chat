@@ -24,20 +24,25 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	rootTemplate.Execute(w, listenAddr)
 }
 
-type Socket struct {
+type socket struct {
 	io.ReadWriter
 	done chan bool
 }
 
+func (s socket) Close() error {
+	s.done <- true
+	return nil
+}
+
 func socketHandler(ws *websocket.Conn) {
-	s := Socket{ws, make(chan bool)}
+	s := socket{ws, make(chan bool)}
 	go mux(s)
 	<-s.done
 }
 
-var partner = make(chan Socket)
+var partner = make(chan io.ReadWriteCloser)
 
-func mux(c Socket) {
+func mux(c io.ReadWriteCloser) {
 	fmt.Fprint(c, "Waiting for a partner...")
 	select {
 	case partner <- c:
@@ -47,7 +52,7 @@ func mux(c Socket) {
 	}
 }
 
-func chat(a, b Socket) {
+func chat(a, b io.ReadWriteCloser) {
 	fmt.Fprintln(a, "Found one! Say hi.")
 	fmt.Fprintln(b, "Found one! Say hi.")
 	errc := make(chan error, 1)
@@ -56,8 +61,8 @@ func chat(a, b Socket) {
 	if err := <-errc; err != nil {
 		log.Println(err)
 	}
-	a.done <- true
-	b.done <- true
+	a.Close()
+	b.Close()
 }
 
 func cp(w io.Writer, r io.Reader, errc chan<- error) {

@@ -138,28 +138,15 @@ code ../http/html.go /websocket.=/ /onClose/
 code ../http/html.go /<\/html>/ $
 code ../http/chat.go /func.rootHandler/ /^}/
 
-* Adding a Socket type
+* Adding a socket type
 
-code ../http/chat.go /type.Socket/ /^}/
+code ../http/chat.go /type.socket/ /^}/
+code ../http/chat.go /func.+socket.+Close/ /^}/
 code ../http/chat.go /func.socketHandler/ /^}/
 
 * Embedding
 
 TODO: explain
-
-* Adapting the existing code
-
-Minimal changes to the existing code are needed to use a Socket instead of an io.ReadWriteCloser.
-- The partner channel now carries Sockets.
-- The mux function is identical except for the type of c.
-code ../http/chat.go /var.partner/
-code ../http/chat.go /func.mux/ /^}/
-
-* Adapting the existing code
-
-Instead of calling Close, the chat function sends a value on the done channel, permitting the socketHandler to return.
-code ../http/chat.go /func.chat/ /^}/
-code ../http/chat.go /func.socketHandler/ /^}/
 
 * Relieving loneliness
 
@@ -185,18 +172,21 @@ code ../markov/markov.go /Generate/ /{/
 
 * Feeding the chain
 
-We will use all text that enters the system to build the markov chains. To do this we split the Socket into a Reader and a Writer, and feed all incoming data to the Chain instance.
-code ../markov/chat.go /type.Socket/ /^}/
+We will use all text that enters the system to build the markov chains. To do this we split the socket into a Reader and a Writer, and feed all incoming data to the Chain instance.
+code ../markov/chat.go /type.socket/ /^}/
 code ../markov/chat.go /var.chain/ /^}/
 
 * The markov bot
 
-code ../markov/chat.go /markovBot.returns/ /^}/
+code ../markov/chat.go /func.Bot/ /^}/
+code ../markov/chat.go /type.bot/ /^}/
+code ../markov/chat.go /func.+bot.+Write/ /^}/
+code ../markov/chat.go /func.+bot.+speak/ /^}/
 
 * Integrating the markov bot
 
 The bot should jump in if a real partner doesn't join.
-To do this, we add a case to the select that triggers after 10 seconds, starting a chat between the user's Socket and a markovBot.
+To do this, we add a case to the select that triggers after 10 seconds, starting a chat between the user's socket and a bot.
 
 The chat function remains untouched.
 code ../markov/chat.go /func.mux/ /^}/

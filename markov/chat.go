@@ -25,10 +25,15 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	rootTemplate.Execute(w, listenAddr)
 }
 
-type Socket struct {
+type socket struct {
 	io.Reader
 	io.Writer
 	done chan bool
+}
+
+func (s socket) Close() error {
+	s.done <- true
+	return nil
 }
 
 var chain = NewChain(2) // 2-word prefixes
@@ -39,26 +44,26 @@ func socketHandler(ws *websocket.Conn) {
 		_, err := io.Copy(io.MultiWriter(w, chain), ws)
 		w.CloseWithError(err)
 	}()
-	s := Socket{r, ws, make(chan bool)}
+	s := socket{r, ws, make(chan bool)}
 	go mux(s)
 	<-s.done
 }
 
-var partner = make(chan Socket)
+var partner = make(chan io.ReadWriteCloser)
 
-func mux(c Socket) {
+func mux(c io.ReadWriteCloser) {
 	fmt.Fprint(c, "Waiting for a partner...")
 	select {
 	case partner <- c:
 		// now handled by the other goroutine
 	case p := <-partner:
 		chat(p, c)
-	case <-time.After(time.Second * 10):
-		chat(markovBot(), c)
+	case <-time.After(10 * time.Second):
+		chat(Bot(), c)
 	}
 }
 
-func chat(a, b Socket) {
+func chat(a, b io.ReadWriteCloser) {
 	fmt.Fprintln(a, "Found one! Say hi.")
 	fmt.Fprintln(b, "Found one! Say hi.")
 	errc := make(chan error, 1)
@@ -67,8 +72,8 @@ func chat(a, b Socket) {
 	if err := <-errc; err != nil {
 		log.Println(err)
 	}
-	a.done <- true
-	b.done <- true
+	a.Close()
+	b.Close()
 }
 
 func cp(w io.Writer, r io.Reader, errc chan<- error) {
@@ -76,27 +81,25 @@ func cp(w io.Writer, r io.Reader, errc chan<- error) {
 	errc <- err
 }
 
-// markovBot returns a Socket that responds to any read by
-// writing a generated sentence.
-func markovBot() Socket {
-	r, out := io.Pipe() // outgoing data
-	in, w := io.Pipe()  // incoming data
-	go func() {
-		b := make([]byte, 1024) // scratch buffer
-		for {
-			if _, err := in.Read(b); err != nil {
-				break
-			}
-			msg := chain.Generate(10) // at most 10 words
-			if _, err := out.Write([]byte(msg)); err != nil {
-				break
-			}
-		}
-	}()
-	done := make(chan bool)
-	go func() {
-		<-done    // block until we get the done signal and then close
-		w.Close() // the pipe, causing the blocking Read above to fail
-	}()
-	return Socket{r, w, done}
+// Bot returns an io.ReadWriteCloser that responds to
+// any incoming writes by writing a generated sentence.
+func Bot() io.ReadWriteCloser {
+	r, out := io.Pipe() // for outgoing data
+	return bot{r, out}
+}
+
+type bot struct {
+	io.ReadCloser
+	out io.Writer
+}
+
+func (b bot) Write(buf []byte) (int, error) {
+	go b.speak()
+	return len(buf), nil
+}
+
+func (b bot) speak() {
+	time.Sleep(time.Second)
+	msg := chain.Generate(10) // at most 10 words
+	b.out.Write([]byte(msg))
 }
