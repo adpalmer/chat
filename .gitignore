@@ -1,6 +1,2 @@
-support/echo
-support/hello
-support/chat-simple
-http/http
-markov/markov
-tcp/tcp
+bin
+talk/makeslide
