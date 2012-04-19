@@ -113,6 +113,7 @@ code ../support/chat-simple.go /func.chat/ /^}/
 
 * Error handling
 
+It's important to clean up when the conversation is over. To do this we send the error value from each io.Copy call to a channel, log any non-nil errors, and close both connections.
 code ../tcp/chat.go /func.chat/ /^}/
 code ../tcp/chat.go /func.cp/ /^}/
 

@@ -690,7 +690,9 @@ func match(c io.ReadWriter) {
           <header>Error handling</header>
 
           <section>
-            <p></p>
+            <p>
+            It&#39;s important to clean up when the conversation is over. To do this we send the error value from each io.Copy call to a channel, log any non-nil errors, and close both connections.<br>
+            </p>
             
 
 
@@ -993,6 +995,13 @@ Prefix           Suffix
 &#34;a&#34; &#34;number!&#34;    &#34;I&#34;
 &#34;number!&#34; &#34;I&#34;    &#34;am&#34;
 &#34;not&#34; &#34;a&#34;        &#34;number!&#34;
+
+Generated sentences beginning with the prefix &#34;I am&#34;
+&#34;I am a free man!&#34;
+&#34;I am not a number! I am a free man!&#34;
+&#34;I am not a number! I am not a number! I am a free man!&#34;
+&#34;I am not a number! I am not a number! I am not a number! I am a free man!&#34;
+
 </pre>
 
 

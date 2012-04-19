@@ -12,3 +12,10 @@ Prefix           Suffix
 "a" "number!"    "I"
 "number!" "I"    "am"
 "not" "a"        "number!"
+
+Generated sentences beginning with the prefix "I am"
+"I am a free man!"
+"I am not a number! I am a free man!"
+"I am not a number! I am not a number! I am a free man!"
+"I am not a number! I am not a number! I am not a number! I am a free man!"
+
