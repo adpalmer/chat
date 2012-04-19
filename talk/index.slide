@@ -70,7 +70,7 @@ The chat program is similar to the echo program. With echo, we copy a connection
 
 For chat, we must copy the incoming data from one user's connection to another's.
 
-Copying the data is easy. As in real life, the hard part is matching one conversation partner with another.
+Copying the data is easy. As in real life, the hard part is matching one partner with another.
 
 * Design diagram
 
@@ -88,14 +88,14 @@ code ../support/select.go
 
 * Modifying echo to create chat
 
-In the accept loop, we replace the call to io.Copy with a call to a new function: mux.
+In the accept loop, we replace the call to io.Copy with a call to a new function: match.
 
 code ../support/echo.go /Accept/ /go/
 code ../support/chat-simple.go /Accept/ /go/
 
 * The matcher
 
-The mux function simultaneously tries to send and receive a connection on a channel.
+The match function simultaneously tries to send and receive a connection on a channel.
 - If the send succeeds, the connection has been handed off to another goroutine, so the function exits and the goroutine shuts down.
 - If the receive succeeds, a connection has been received from another goroutine. The current goroutine then has two connections, so it starts a chat session between them.
 
@@ -128,7 +128,7 @@ Instead of TCP sockets, we'll use websockets. Websocket support for Go is availa
 
 We'll serve the user interface with Go's built-in "net/http" package.
 
-* Using the http and weboscket packages
+* Using the http and websocket packages
 
 code ../http/chat.go /package/ /^}/
 
@@ -194,7 +194,7 @@ The bot should jump in if a real partner doesn't join.
 To do this, we add a case to the select that triggers after 10 seconds, starting a chat between the user's socket and a bot.
 
 The chat function remains untouched.
-code ../markov/chat.go /func.mux/ /^}/
+code ../markov/chat.go /func.match/ /^}/
 
 * Demo
 

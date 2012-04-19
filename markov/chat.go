@@ -45,13 +45,13 @@ func socketHandler(ws *websocket.Conn) {
 		w.CloseWithError(err)
 	}()
 	s := socket{r, ws, make(chan bool)}
-	go mux(s)
+	go match(s)
 	<-s.done
 }
 
 var partner = make(chan io.ReadWriteCloser)
 
-func mux(c io.ReadWriteCloser) {
+func match(c io.ReadWriteCloser) {
 	fmt.Fprint(c, "Waiting for a partner...")
 	select {
 	case partner <- c:

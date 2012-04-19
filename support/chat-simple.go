@@ -19,13 +19,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		go mux(c)
+		go match(c)
 	}
 }
 
 var partner = make(chan io.ReadWriter)
 
-func mux(c io.ReadWriter) {
+func match(c io.ReadWriter) {
 	fmt.Fprint(c, "Waiting for a partner...")
 	select {
 	case partner <- c:

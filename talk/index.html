@@ -453,7 +453,7 @@ func main() {
             
             <br>
             
-            Copying the data is easy. As in real life, the hard part is matching one conversation partner with another.<br>
+            Copying the data is easy. As in real life, the hard part is matching one partner with another.<br>
             
             <br>
             </p>
@@ -568,7 +568,7 @@ func main() {
 
           <section>
             <p>
-            In the accept loop, we replace the call to io.Copy with a call to a new function: mux.<br>
+            In the accept loop, we replace the call to io.Copy with a call to a new function: match.<br>
             
             <br>
             </p>
@@ -590,7 +590,7 @@ func main() {
         if err != nil {
             log.Fatal(err)
         }
-        go mux(c)
+        go match(c)
 </pre>
 
 
@@ -605,7 +605,7 @@ func main() {
 
           <section>
             <p>
-            The mux function simultaneously tries to send and receive a connection on a channel.<br>
+            The match function simultaneously tries to send and receive a connection on a channel.<br>
             </p>
             
             <ul>
@@ -622,7 +622,7 @@ func main() {
 <!--{{code "../support/chat-simple.go" `/var.partner/` `/^}/`}}
 -->var partner = make(chan io.ReadWriter)
 
-func mux(c io.ReadWriter) {
+func match(c io.ReadWriter) {
     fmt.Fprint(c, &#34;Waiting for a partner...&#34;)
     select {
     case partner &lt;- c:
@@ -768,7 +768,7 @@ func mux(c io.ReadWriter) {
         </div> <!-- end slide template -->
       <!-- end of slide 18 --><!-- start of slide 19 -->
         <div class="slide" id="slide-19">
-          <header>Using the http and weboscket packages</header>
+          <header>Using the http and websocket packages</header>
 
           <section>
             <p></p>
@@ -868,7 +868,7 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
 <!--{{code "../http/chat.go" `/func.socketHandler/` `/^}/`}}
 -->func socketHandler(ws *websocket.Conn) {
     s := socket{ws, make(chan bool)}
-    go mux(s)
+    go match(s)
     &lt;-s.done
 }
 </pre>
@@ -1075,7 +1075,7 @@ func socketHandler(ws *websocket.Conn) {
         w.CloseWithError(err)
     }()
     s := socket{r, ws, make(chan bool)}
-    go mux(s)
+    go match(s)
     &lt;-s.done
 }
 </pre>
@@ -1154,8 +1154,8 @@ func Bot() io.ReadWriteCloser {
 
 
 <pre>
-<!--{{code "../markov/chat.go" `/func.mux/` `/^}/`}}
--->func mux(c io.ReadWriteCloser) {
+<!--{{code "../markov/chat.go" `/func.match/` `/^}/`}}
+-->func match(c io.ReadWriteCloser) {
     fmt.Fprint(c, &#34;Waiting for a partner...&#34;)
     select {
     case partner &lt;- c:
