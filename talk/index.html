@@ -527,7 +527,7 @@ func fibs(ch chan int) {
 
           <section>
             <p>
-            A select block is like a switch, but it selects exactly one channel operation.<br>
+            A select statement is like a switch, but it selects over channel operations (and chooses exactly one of them).<br>
             </p>
             
 
@@ -620,9 +620,9 @@ func main() {
 
 <pre>
 <!--{{code "../support/chat-simple.go" `/var.partner/` `/^}/`}}
--->var partner = make(chan io.ReadWriter)
+-->var partner = make(chan io.ReadWriteCloser)
 
-func match(c io.ReadWriter) {
+func match(c io.ReadWriteCloser) {
     fmt.Fprint(c, &#34;Waiting for a partner...&#34;)
     select {
     case partner &lt;- c:
@@ -658,7 +658,7 @@ func match(c io.ReadWriter) {
 
 <pre>
 <!--{{code "../support/chat-simple.go" `/func.chat/` `/^}/`}}
--->func chat(a, b io.ReadWriter) {
+-->func chat(a, b io.ReadWriteCloser) {
     fmt.Fprintln(a, &#34;Found one! Say hi.&#34;)
     fmt.Fprintln(b, &#34;Found one! Say hi.&#34;)
     go io.Copy(a, b)
@@ -867,15 +867,6 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
 
 
 <pre>
-<!--{{code "../http/chat.go" `/func.socketHandler/` `/^}/`}}
--->func socketHandler(ws *websocket.Conn) {
-    s := socket{ws, make(chan bool)}
-    go match(s)
-    &lt;-s.done
-}
-</pre>
-
-<pre>
 <!--{{code "../http/chat.go" `/type.socket/` `/^}/`}}
 -->type socket struct {
     io.ReadWriter
@@ -891,6 +882,15 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
 }
 </pre>
 
+<pre>
+<!--{{code "../http/chat.go" `/func.socketHandler/` `/^}/`}}
+-->func socketHandler(ws *websocket.Conn) {
+    s := socket{ws, make(chan bool)}
+    go match(s)
+    &lt;-s.done
+}
+</pre>
+
 
             <p>
             <br>
@@ -899,6 +899,19 @@ var rootTemplate = template.Must(template.New(&#34;root&#34;).Parse(`
         </div> <!-- end slide template -->
       <!-- end of slide 21 --><!-- start of slide 22 -->
         <div class="slide" id="slide-22">
+          <header>Demo</header>
+
+          <section>
+            <p></p>
+            
+
+
+
+            <p>
+          </section>
+        </div> <!-- end slide template -->
+      <!-- end of slide 22 --><!-- start of slide 23 -->
+        <div class="slide" id="slide-23">
           <header>Struct embedding</header>
 
           <section>
@@ -930,19 +943,6 @@ func main() {
             <p>
             <br>
             
-          </section>
-        </div> <!-- end slide template -->
-      <!-- end of slide 22 --><!-- start of slide 23 -->
-        <div class="slide" id="slide-23">
-          <header>Demo</header>
-
-          <section>
-            <p></p>
-            
-
-
-
-            <p>
           </section>
         </div> <!-- end slide template -->
       <!-- end of slide 23 --><!-- start of slide 24 -->

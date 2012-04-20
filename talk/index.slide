@@ -83,7 +83,7 @@ code ../support/chan.go
 
 * Select
 
-A select block is like a switch, but it selects exactly one channel operation.
+A select statement is like a switch, but it selects over channel operations (and chooses exactly one of them).
 code ../support/select.go
 
 * Modifying echo to create chat
@@ -143,16 +143,16 @@ code ../http/chat.go /func.rootHandler/ /^}/
 * Adding a socket type
 
 We can't just use a websocket.Conn instead of the net.Conn, because a websocket.Conn is held open by its handler function. Here we use a channel to keep the handler running until the socket's Close method is called.
-code ../http/chat.go /func.socketHandler/ /^}/
 code ../http/chat.go /type.socket/ /^}/
 code ../http/chat.go /func.+socket.+Close/ /^}/
+code ../http/chat.go /func.socketHandler/ /^}/
+
+* Demo
 
 * Struct embedding
 
 Go supports a kind of "mix-in" functionality with a feature known as "struct embedding". The embedding struct inherits the embedded type's methods.
 code ../support/embed.go /type/ $
-
-* Demo
 
 * Relieving loneliness
 

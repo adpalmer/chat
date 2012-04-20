@@ -23,9 +23,9 @@ func main() {
 	}
 }
 
-var partner = make(chan io.ReadWriter)
+var partner = make(chan io.ReadWriteCloser)
 
-func match(c io.ReadWriter) {
+func match(c io.ReadWriteCloser) {
 	fmt.Fprint(c, "Waiting for a partner...")
 	select {
 	case partner <- c:
@@ -35,7 +35,7 @@ func match(c io.ReadWriter) {
 	}
 }
 
-func chat(a, b io.ReadWriter) {
+func chat(a, b io.ReadWriteCloser) {
 	fmt.Fprintln(a, "Found one! Say hi.")
 	fmt.Fprintln(b, "Found one! Say hi.")
 	go io.Copy(a, b)
